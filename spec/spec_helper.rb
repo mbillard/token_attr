@@ -8,11 +8,6 @@ require 'token_attr'
 RSpec.configure do |config|
 end
 
-class Model < ActiveRecord::Base
-  extend TokenAttr
-  token_attr :token
-end
-
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3',
                                         database: ':memory:')
 
