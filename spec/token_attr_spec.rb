@@ -3,26 +3,33 @@ require 'spec_helper'
 describe TokenAttr do
 
   class Model < ActiveRecord::Base
-    extend TokenAttr
+    include TokenAttr
     token_attr :token
   end
 
   class ModelWithLength < ActiveRecord::Base
     self.table_name = 'models'
-    extend TokenAttr
+    include TokenAttr
     token_attr :token, length: 13
   end
 
   class ModelWithAlphabet < ActiveRecord::Base
     self.table_name = 'models'
-    extend TokenAttr
+    include TokenAttr
     token_attr :token, alphabet: 'abc123'
   end
 
   class ModelWithSlugAlphabet < ActiveRecord::Base
     self.table_name = 'models'
-    extend TokenAttr
+    include TokenAttr
     token_attr :token, alphabet: :slug
+  end
+
+  class ModelWithMultipleTokens < ActiveRecord::Base
+    self.table_name = 'models'
+    include TokenAttr
+    token_attr :token
+    token_attr :private_token
   end
 
   describe ".token_attr" do
@@ -74,6 +81,16 @@ describe TokenAttr do
           model.token.split('').all? do |c|
             'token'.include?(c)
           end.should be_true
+        end
+      end
+
+      context "when the model has multiple tokens" do
+        let(:model) { ModelWithMultipleTokens.new }
+
+        it "generates each token" do
+          model.valid?
+          model.token.should_not         be_blank
+          model.private_token.should_not be_blank
         end
       end
     end

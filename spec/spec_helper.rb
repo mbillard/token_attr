@@ -16,6 +16,7 @@ ActiveRecord::Schema.define do
 
   create_table :models, force: true do |t|
     t.string :token
+    t.string :private_token
   end
 
 end
