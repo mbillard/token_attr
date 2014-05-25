@@ -1,4 +1,4 @@
-# TokenAttr
+# token_attr
 
 [Description]
 
@@ -9,6 +9,8 @@ Add `token_attr` to your Gemfile:
     gem 'token_attr'
 
 ## Usage
+
+[TODO]
 
 ## Contributing
 
