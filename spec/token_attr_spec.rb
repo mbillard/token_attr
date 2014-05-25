@@ -13,6 +13,12 @@ describe TokenAttr do
     token_attr :token, length: 13
   end
 
+  class ModelWithAlphabet < ActiveRecord::Base
+    self.table_name = 'models'
+    extend TokenAttr
+    token_attr :token, alphabet: 'abc123'
+  end
+
   describe ".token_attr" do
     let(:model) { Model.new }
 
@@ -36,6 +42,17 @@ describe TokenAttr do
         it "generates a token of the specified length" do
           model.valid?
           model.token.length.should == 13
+        end
+      end
+
+      context "when an alphabet is specified" do
+        let(:model) { ModelWithAlphabet.new }
+
+        it "generates a token with characters from that alphabet" do
+          model.valid?
+          model.token.split('').all? do |c|
+            'abc123'.include?(c)
+          end.should be_true
         end
       end
     end
