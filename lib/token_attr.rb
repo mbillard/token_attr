@@ -2,7 +2,8 @@ require 'token_attr/version'
 require 'active_record'
 
 module TokenAttr
-  DEFAULT_TOKEN_LENGTH = 8.freeze
+  DEFAULT_TOKEN_LENGTH  = 8.freeze
+  DEFAULT_SLUG_ALPHABET = [('a'..'z'),('A'..'Z'),(0..9)].map(&:to_a).flatten.freeze
 
   def token_attr(attr_name, options = {})
     token_attributes << attr_name
@@ -17,7 +18,9 @@ module TokenAttr
       token_length = options.fetch(:length, DEFAULT_TOKEN_LENGTH)
 
       if alphabet = options[:alphabet]
-        alphabet.split('').shuffle[0, token_length].join
+        alphabet = DEFAULT_SLUG_ALPHABET if alphabet == :slug
+        alphabet_array = alphabet.split('')
+        (0...token_length).map{ alphabet_array.sample }.join
       else
         hex_length = (token_length / 2.0).ceil # 2 characters per length
         SecureRandom.hex(hex_length).slice(0...token_length)

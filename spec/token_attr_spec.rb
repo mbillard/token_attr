@@ -19,6 +19,12 @@ describe TokenAttr do
     token_attr :token, alphabet: 'abc123'
   end
 
+  class ModelWithSlugAlphabet < ActiveRecord::Base
+    self.table_name = 'models'
+    extend TokenAttr
+    token_attr :token, alphabet: :slug
+  end
+
   describe ".token_attr" do
     let(:model) { Model.new }
 
@@ -52,6 +58,21 @@ describe TokenAttr do
           model.valid?
           model.token.split('').all? do |c|
             'abc123'.include?(c)
+          end.should be_true
+        end
+
+        it "generates a token of the default length even if lower than the alphabet" do
+          stub_const('TokenAttr::DEFAULT_TOKEN_LENGTH', 12)
+          model.valid?
+          model.token.length.should == 12
+        end
+
+        it "generates a token with the default slug alphabet if the alphabet is :slug" do
+          model = ModelWithSlugAlphabet.new
+          stub_const('TokenAttr::DEFAULT_SLUG_ALPHABET', 'token')
+          model.valid?
+          model.token.split('').all? do |c|
+            'token'.include?(c)
           end.should be_true
         end
       end
