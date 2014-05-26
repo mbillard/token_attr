@@ -21,7 +21,7 @@ user.valid?
 user.token # => "b8bd30ff"
 ```
 
-The token is generated in a `before_validation` callback.
+The token is generated in a `before_validation` callback only if the it's `nil`.
 
 ### Options
 
@@ -48,10 +48,10 @@ Accepted values:
 - a string - a string of your choice of the characters you want to use
 
 ```
-token_attr :token, alphabet: :numeric # => "82051173"
-token_attr :token, alphabet: :alphabetic # => "xqnInSJa"
+token_attr :token, alphabet: :numeric      # => "82051173"
+token_attr :token, alphabet: :alphabetic   # => "xqnInSJa"
 token_attr :token, alphabet: :alphanumeric # => "61nD0lUo"
-token_attr :token, alphabet: "token" # => "ktnekoet"
+token_attr :token, alphabet: "token"       # => "ktnekoet"
 ```
 
 ## Contributing
