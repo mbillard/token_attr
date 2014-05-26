@@ -6,7 +6,7 @@
 
 Add `token_attr` to your Gemfile:
 
-    gem 'token_attr'
+    gem 'token_attr', '~> 0.1.0'
 
 ## Usage
 
