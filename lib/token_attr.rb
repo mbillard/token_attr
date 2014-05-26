@@ -56,9 +56,9 @@ module TokenAttr
         new_token = nil
         try_count = 0
         begin
+          raise TooManyAttemptsError.new(attr_name, new_token) if try_count == 5
           new_token = send("generate_new_#{attr_name}_token")
           try_count += 1
-          raise TooManyAttemptsError.new(attr_name, new_token) if try_count == 5
         end until token_is_unique?(attr_name, new_token)
 
         send "#{attr_name}=", new_token
