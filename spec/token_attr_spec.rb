@@ -19,10 +19,22 @@ describe TokenAttr do
     token_attr :token, alphabet: 'abc123'
   end
 
-  class ModelWithSlugAlphabet < ActiveRecord::Base
+  class ModelWithAlphanumericAlphabet < ActiveRecord::Base
     self.table_name = 'models'
     include TokenAttr
     token_attr :token, alphabet: :alphanumeric
+  end
+
+  class ModelWithAlphabeticAlphabet < ActiveRecord::Base
+    self.table_name = 'models'
+    include TokenAttr
+    token_attr :token, alphabet: :alphabetic
+  end
+
+  class ModelWithNumericAlphabet < ActiveRecord::Base
+    self.table_name = 'models'
+    include TokenAttr
+    token_attr :token, alphabet: :numeric
   end
 
   class ModelWithMultipleTokens < ActiveRecord::Base
@@ -89,14 +101,27 @@ describe TokenAttr do
         end
 
         it "generates a token with alphanumeric characters when the alphabet is :alphanumeric" do
-          fake_alphabet = double('String')
-          fake_alphabet.stub(:split).and_return(fake_alphabet)
-          fake_alphabet.should_receive(:sample).exactly(8).times.and_return('T')
-          stub_const('TokenAttr::ALPHANUMERIC_ALPHABET', fake_alphabet)
+          fake_alphabet('TokenAttr::ALPHANUMERIC_ALPHABET', times: 8, sample: 'T')
 
-          model = ModelWithSlugAlphabet.new
+          model = ModelWithAlphanumericAlphabet.new
           model.valid?
           model.token.should == 'TTTTTTTT'
+        end
+
+        it "generates a token with alphabetic characters when the alphabet is :alphabetic" do
+          fake_alphabet('TokenAttr::ALPHABETIC_ALPHABET', times: 8, sample: 't')
+
+          model = ModelWithAlphabeticAlphabet.new
+          model.valid?
+          model.token.should == 'tttttttt'
+        end
+
+        it "generates a token with numeric characters when the alphabet is :numeric" do
+          fake_alphabet('TokenAttr::NUMERIC_ALPHABET', times: 8, sample: '0')
+
+          model = ModelWithNumericAlphabet.new
+          model.valid?
+          model.token.should == '00000000'
         end
       end
 
@@ -119,6 +144,15 @@ describe TokenAttr do
         model.token.should == 'not blank'
       end
     end
+  end
+
+  protected
+
+  def fake_alphabet(alphabet_const, times: 8, sample: 'T')
+    fake = double('Array')
+    fake.stub(:split).and_return(fake)
+    fake.should_receive(:sample).exactly(times).times.and_return(sample)
+    stub_const(alphabet_const, fake)
   end
 
 end
