@@ -49,6 +49,20 @@ describe TokenAttr do
         model.token.length.should == 4
       end
 
+      it "generates a unique token" do
+        SecureRandom.should_receive(:hex).twice.with(4).and_return('12345678')
+        SecureRandom.should_receive(:hex).once.with(4).and_return('abcdefgh')
+        existing_model = Model.create
+        model.valid?
+        model.token.should == 'abcdefgh'
+      end
+
+      it "raises an exception if it can't find a unique token" do
+        SecureRandom.should_receive(:hex).exactly(5 + 1).times.with(4).and_return('12345678')
+        existing_model = Model.create
+        expect{ model.valid? }.to raise_error(TokenAttr::TooManyAttemptsError)
+      end
+
       context "when length is specified" do
         let(:model) { ModelWithLength.new }
 

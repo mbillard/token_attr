@@ -6,6 +6,9 @@ require 'token_attr'
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+  config.before :each do
+    Model.delete_all
+  end
 end
 
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3',
