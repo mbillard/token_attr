@@ -22,7 +22,7 @@ describe TokenAttr do
   class ModelWithSlugAlphabet < ActiveRecord::Base
     self.table_name = 'models'
     include TokenAttr
-    token_attr :token, alphabet: :slug
+    token_attr :token, alphabet: :alphanumeric
   end
 
   class ModelWithMultipleTokens < ActiveRecord::Base
@@ -88,13 +88,15 @@ describe TokenAttr do
           model.token.length.should == 12
         end
 
-        it "generates a token with the default slug alphabet if the alphabet is :slug" do
+        it "generates a token with alphanumeric characters when the alphabet is :alphanumeric" do
+          fake_alphabet = double('String')
+          fake_alphabet.stub(:split).and_return(fake_alphabet)
+          fake_alphabet.should_receive(:sample).exactly(8).times.and_return('T')
+          stub_const('TokenAttr::ALPHANUMERIC_ALPHABET', fake_alphabet)
+
           model = ModelWithSlugAlphabet.new
-          stub_const('TokenAttr::DEFAULT_SLUG_ALPHABET', 'token')
           model.valid?
-          model.token.split('').all? do |c|
-            'token'.include?(c)
-          end.should be_true
+          model.token.should == 'TTTTTTTT'
         end
       end
 

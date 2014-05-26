@@ -6,7 +6,7 @@ module TokenAttr
   extend ActiveSupport::Concern
 
   DEFAULT_TOKEN_LENGTH  = 8.freeze
-  DEFAULT_SLUG_ALPHABET = [('a'..'z'),('A'..'Z'),(0..9)].map(&:to_a).flatten.freeze
+  ALPHANUMERIC_ALPHABET = [('a'..'z'),('A'..'Z'),(0..9)].map(&:to_a).join.freeze
 
   class TooManyAttemptsError < StandardError
     attr_reader :attribute, :token
@@ -35,7 +35,7 @@ module TokenAttr
         token_length = options.fetch(:length, DEFAULT_TOKEN_LENGTH)
 
         if alphabet = options[:alphabet]
-          alphabet = DEFAULT_SLUG_ALPHABET if alphabet == :slug
+          alphabet = ALPHANUMERIC_ALPHABET if alphabet == :alphanumeric
           alphabet_array = alphabet.split('')
           (0...token_length).map{ alphabet_array.sample }.join
         else
