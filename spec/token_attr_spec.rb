@@ -44,6 +44,16 @@ describe TokenAttr do
     token_attr :private_token
   end
 
+  class ModelWithOverride < ActiveRecord::Base
+    self.table_name = 'models'
+    include TokenAttr
+    token_attr :token
+
+    def should_generate_new_token?
+      token == '1234'
+    end
+  end
+
   describe ".token_attr" do
     let(:model) { Model.new }
 
@@ -133,6 +143,22 @@ describe TokenAttr do
           model.token.should_not         be_blank
           model.private_token.should_not be_blank
         end
+      end
+    end
+
+    context "when the should_generate_new_[attr_name]? method is overridden" do
+      let(:model) { ModelWithOverride.new }
+
+      it "generates a token when the condition is satisfied" do
+        SecureRandom.should_receive(:hex).with(4).and_return('newtoken')
+        model.token = '1234'
+        model.valid?
+        model.token.should == 'newtoken'
+      end
+
+      it "does not generate a new token when the condition is not satisfied" do
+        model.valid?
+        model.token.should be_nil
       end
     end
 

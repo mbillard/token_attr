@@ -29,11 +29,11 @@ module TokenAttr
     def token_attr(attr_name, options = {})
       token_attributes << attr_name
 
-      define_method "should_generate_new_#{attr_name}_token?" do
+      define_method "should_generate_new_#{attr_name}?" do
         send(attr_name).blank?
       end
 
-      define_method "generate_new_#{attr_name}_token" do
+      define_method "generate_new_#{attr_name}" do
         token_length = options.fetch(:length, DEFAULT_TOKEN_LENGTH)
 
         if alphabet = options[:alphabet]
@@ -62,12 +62,12 @@ module TokenAttr
 
   def generate_tokens
     self.class.token_attributes.each do |attr_name|
-      if send("should_generate_new_#{attr_name}_token?")
+      if send("should_generate_new_#{attr_name}?")
         new_token = nil
         try_count = 0
         begin
           raise TooManyAttemptsError.new(attr_name, new_token) if try_count == 5
-          new_token = send("generate_new_#{attr_name}_token")
+          new_token = send("generate_new_#{attr_name}")
           try_count += 1
         end until token_is_unique?(attr_name, new_token)
 
