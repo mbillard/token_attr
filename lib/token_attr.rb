@@ -21,13 +21,15 @@ module TokenAttr
     end
   end
 
+  TokenDefinition = Struct.new(:attr_name, :scope_attr)
+
   included do
     before_validation :generate_tokens
   end
 
   module ClassMethods
     def token_attr(attr_name, options = {})
-      token_attributes << attr_name
+      token_definitions << TokenDefinition.new(attr_name, options[:scope])
 
       define_method "should_generate_new_#{attr_name}?" do
         send(attr_name).blank?
@@ -55,30 +57,34 @@ module TokenAttr
       end
     end
 
-    def token_attributes
-      @token_attributes ||= []
+    def token_definitions
+      @token_definitions ||= []
     end
   end
 
   def generate_tokens
-    self.class.token_attributes.each do |attr_name|
-      if send("should_generate_new_#{attr_name}?")
+    self.class.token_definitions.each do |td|
+      if send("should_generate_new_#{td.attr_name}?")
         new_token = nil
         try_count = 0
         begin
-          raise TooManyAttemptsError.new(attr_name, new_token) if try_count == 5
-          new_token = send("generate_new_#{attr_name}")
+          raise TooManyAttemptsError.new(td.attr_name, new_token) if try_count == 5
+          new_token = send("generate_new_#{td.attr_name}")
           try_count += 1
-        end until token_is_unique?(attr_name, new_token)
+        end until token_is_unique?(td, new_token)
 
-        send "#{attr_name}=", new_token
+        send "#{td.attr_name}=", new_token
       end
     end
   end
 
-  def token_is_unique?(attr_name, token)
+  def token_is_unique?(token_definition, token)
+    attr_name  = token_definition.attr_name
+    scope_attr = token_definition.scope_attr
+
     scope = self.class.where(attr_name => token)
-    scope = scope.where(id != self.id) if self.persisted?
+    scope = scope.where.not(id: self.id) if self.persisted?
+    scope = scope.where(scope_attr => read_attribute(scope_attr)) if scope_attr
     !scope.exists?
   end
 

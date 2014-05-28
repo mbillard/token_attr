@@ -54,6 +54,12 @@ describe TokenAttr do
     end
   end
 
+  class ModelWithScope < ActiveRecord::Base
+    self.table_name = 'models'
+    include TokenAttr
+    token_attr :token, scope: :scope_id
+  end
+
   describe ".token_attr" do
     let(:model) { Model.new }
 
@@ -159,6 +165,31 @@ describe TokenAttr do
       it "does not generate a new token when the condition is not satisfied" do
         model.valid?
         model.token.should be_nil
+      end
+    end
+
+    context "with scope" do
+      let(:model) { ModelWithScope.new }
+
+      context "when the scope attributes are different" do
+        it "allows duplicate tokens" do
+          SecureRandom.should_receive(:hex).twice.with(4).and_return('12345678')
+          ModelWithScope.create(scope_id: 1)
+          model.scope_id = 2
+          model.valid?
+          model.token.should == '12345678'
+        end
+      end
+
+      context "when the scope attributes are the same" do
+        it "regenerates a duplicate token" do
+          SecureRandom.should_receive(:hex).twice.with(4).and_return('12345678')
+          SecureRandom.should_receive(:hex).once.with(4).and_return('asdfghjk')
+          ModelWithScope.create(scope_id: 1)
+          model.scope_id = 1
+          model.valid?
+          model.token.should == 'asdfghjk'
+        end
       end
     end
 
