@@ -12,7 +12,7 @@ Add `token_attr` to your Gemfile:
 
 ```
 class User < ActiveRecord::Base
-  include TokenAttr
+  include TokenAttr::Concern
   token_attr :token
 end
 

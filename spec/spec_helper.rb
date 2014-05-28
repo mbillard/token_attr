@@ -24,3 +24,8 @@ ActiveRecord::Schema.define do
   end
 
 end
+
+class BaseModel < ActiveRecord::Base
+  self.table_name = 'models'
+  include TokenAttr::Concern
+end

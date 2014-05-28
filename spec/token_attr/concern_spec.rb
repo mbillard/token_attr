@@ -2,51 +2,36 @@ require 'spec_helper'
 
 describe TokenAttr do
 
-  class Model < ActiveRecord::Base
-    include TokenAttr
+  class Model < BaseModel
     token_attr :token
   end
 
-  class ModelWithLength < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithLength < BaseModel
     token_attr :token, length: 13
   end
 
-  class ModelWithAlphabet < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithAlphabet < BaseModel
     token_attr :token, alphabet: 'abc123'
   end
 
-  class ModelWithAlphanumericAlphabet < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithAlphanumericAlphabet < BaseModel
     token_attr :token, alphabet: :alphanumeric
   end
 
-  class ModelWithAlphabeticAlphabet < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithAlphabeticAlphabet < BaseModel
     token_attr :token, alphabet: :alphabetic
   end
 
-  class ModelWithNumericAlphabet < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithNumericAlphabet < BaseModel
     token_attr :token, alphabet: :numeric
   end
 
-  class ModelWithMultipleTokens < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithMultipleTokens < BaseModel
     token_attr :token
     token_attr :private_token
   end
 
-  class ModelWithOverride < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithOverride < BaseModel
     token_attr :token
 
     def should_generate_new_token?
@@ -54,9 +39,7 @@ describe TokenAttr do
     end
   end
 
-  class ModelWithScope < ActiveRecord::Base
-    self.table_name = 'models'
-    include TokenAttr
+  class ModelWithScope < BaseModel
     token_attr :token, scope: :scope_id
   end
 
