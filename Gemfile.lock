@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    token_attr (0.1.0)
+    token_attr (0.2.0)
       activerecord (>= 4.0.0)
 
 GEM

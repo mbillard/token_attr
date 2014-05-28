@@ -6,7 +6,7 @@ Unique random token generator for ActiveRecord.
 
 Add `token_attr` to your Gemfile:
 
-    gem 'token_attr', '~> 0.1.0'
+    gem 'token_attr', '~> 0.2.0'
 
 ## Usage
 
