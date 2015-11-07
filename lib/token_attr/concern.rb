@@ -3,9 +3,13 @@ require 'active_support/concern'
 
 module TokenAttr
   DEFAULT_TOKEN_LENGTH  = 8.freeze
+  DEFAULT_WORDS_COUNT   = 3.freeze
   ALPHABETIC_ALPHABET   = [('a'..'z'),('A'..'Z')].map(&:to_a).flatten.freeze
   NUMERIC_ALPHABET      = [(0..9)].map(&:to_a).flatten.freeze
   ALPHANUMERIC_ALPHABET = [ALPHABETIC_ALPHABET, NUMERIC_ALPHABET].flatten.freeze
+  WORDS_BANK            = File.open(File.join(File.dirname(__FILE__), "../../config/words_bank.txt"), "r") do |f|
+    f.each_line.map { |l| l.strip }
+  end
 
   TokenDefinition = Struct.new(:attr_name, :scope_attr)
 
@@ -25,7 +29,8 @@ module TokenAttr
         end
 
         define_method "generate_new_#{attr_name}" do
-          token_length = options.fetch(:length, DEFAULT_TOKEN_LENGTH)
+          default_length = options[:alphabet] == :words ? DEFAULT_WORDS_COUNT : DEFAULT_TOKEN_LENGTH
+          token_length = options.fetch(:length, default_length)
 
           if alphabet = options[:alphabet]
             alphabet_array = case alphabet
@@ -35,6 +40,8 @@ module TokenAttr
               ALPHABETIC_ALPHABET
             when :numeric
               NUMERIC_ALPHABET
+            when :words
+              WORDS_BANK
             else
               alphabet.split('')
             end

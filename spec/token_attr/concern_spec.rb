@@ -26,6 +26,14 @@ describe TokenAttr do
     token_attr :token, alphabet: :numeric
   end
 
+  class ModelWithWords < BaseModel
+    token_attr :token, alphabet: :words
+  end
+
+  class ModelWithWordsAndLength < BaseModel
+    token_attr :token, alphabet: :words, length: 4
+  end
+
   class ModelWithMultipleTokens < BaseModel
     token_attr :token
     token_attr :private_token
@@ -122,6 +130,28 @@ describe TokenAttr do
           model.valid?
           model.token.should == '00000000'
         end
+
+        it "generates a token with 3 words from the words bank when the alphabet is :words" do
+          model = ModelWithWords.new
+          model.valid?
+          model.token.should_not be_blank
+        end
+
+        it "generates a token with 3 words when the alphabet is :words" do
+          stub_const('TokenAttr::WORDS_BANK', ['Word', 'Word'])
+
+          model = ModelWithWords.new
+          model.valid?
+          model.token.should == 'WordWordWord'
+        end
+
+        it "generates a token with the number of words specified by length when the alphabet is :words" do
+          stub_const('TokenAttr::WORDS_BANK', ['Word', 'Word'])
+
+          model = ModelWithWordsAndLength.new
+          model.valid?
+          model.token.should == 'WordWordWordWord'
+        end
       end
 
       context "when the model has multiple tokens" do
@@ -194,5 +224,4 @@ describe TokenAttr do
     fake.should_receive(:sample).exactly(times).times.and_return(sample)
     stub_const(alphabet_const, fake)
   end
-
 end
